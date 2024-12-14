@@ -38,7 +38,7 @@ class PermiUserRecord(models.Model):
     usercompany = models.ForeignKey(
         UserCompany,
         on_delete=models.PROTECT,
-        related_name='user_permissions',
+        related_name='user_permissions_permiuserrecord',
         verbose_name=_("Usuario por Compañía"),
         help_text=_("Relación usuario-compañía a la que se asigna el permiso.")
     )
@@ -46,7 +46,7 @@ class PermiUserRecord(models.Model):
     permission = models.ForeignKey(
         Permission,
         on_delete=models.PROTECT,
-        related_name='permission_users',
+        related_name='permission_users_permiuserrecord',
         verbose_name=_("Permiso"),
         help_text=_("Permiso asignado al usuario.")
     )
@@ -54,10 +54,11 @@ class PermiUserRecord(models.Model):
     entitycatalog = models.ForeignKey(
         EntityCatalog,
         on_delete=models.PROTECT,
-        related_name='entity_permissions',
+        related_name='entity_permissions_permiuserrecord',
         verbose_name=_("Entidad"),
         help_text=_("Entidad sobre la que se aplica el permiso.")
     )
+    # añadi permiuser al final de los permisos para evitar conflictos
 
     peusr_record = models.BigIntegerField(
         verbose_name=_("ID del Registro"),
