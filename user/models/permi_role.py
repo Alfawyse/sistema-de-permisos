@@ -70,5 +70,5 @@ class PermiRole(models.Model):
     class Meta:
         verbose_name = _("Permiso de Rol")
         verbose_name_plural = _("Permisos de Rol")
-        unique_together = ['role', 'permission', 'entitycatalog', 'perol_record']
+        unique_together = ['role', 'permission', 'entitycatalog'] #campo perol_record eliminado no existe
 
