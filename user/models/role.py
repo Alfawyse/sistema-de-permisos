@@ -65,4 +65,4 @@ class Role(models.Model):
         unique_together = ['company', 'role_name'] #role_code no existe es role_name
 
     def __str__(self):
-        return f"{self.role_name} - {self.company.compa_name} ({self.id_role})"
+        return f"{self.role_name} - {self.company.company_name} ({self.id_role})"
