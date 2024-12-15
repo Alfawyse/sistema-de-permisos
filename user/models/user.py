@@ -73,5 +73,6 @@ class User(models.Model):
         verbose_name_plural = _("Usuarios")
 
     def __str__(self):
-        return f"{self.user_first_name} {self.user_last_name} ({self.user_username})"
+        return f"{self.user_username} ({self.user_email})"
+
 
