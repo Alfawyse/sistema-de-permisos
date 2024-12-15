@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'core',
     'user',
     'ERP',
+    'drf_yasg', #swagger
 ]
 
 

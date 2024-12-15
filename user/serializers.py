@@ -16,7 +16,10 @@ class RoleSerializer(serializers.ModelSerializer):
         fields = ['id_role', 'role_name', 'role_description', 'role_active', 'company']
 
 # Serializador para Permisos
+
 class PermissionSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(source='id_permi', read_only=True)
+
     class Meta:
         model = Permission
-        fields = ['id', 'name', 'can_read', 'can_create', 'can_update', 'can_delete']
+        fields = ['id', 'name', 'description', 'can_create', 'can_read', 'can_update', 'can_delete', 'can_import', 'can_export']
