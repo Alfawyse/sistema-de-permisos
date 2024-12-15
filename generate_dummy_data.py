@@ -146,27 +146,31 @@ def generate_data():
                     perol_include=True
                 )
 
-    # Crear Usuarios y Relaciones Usuario-Compañía
-    print("Creando Usuarios y Relaciones Usuario-Compañía...")
-    user_companies = []
+        # Crear Usuarios y Relaciones Usuario-Compañía
+        print("Creando Usuarios y Relaciones Usuario-Compañía...")
+        user_companies = []
 
-    for i in range(10):  # Crear 10 usuarios
-        user = User.objects.create(
-            user_username=fake.user_name(),
-            user_password=make_password("password123"),
-            user_email=fake.unique.email(),
-            user_phone=fake.phone_number(),
-            user_is_admin=random.choice([True, False]),
-            user_is_active=True
-        )
+        for i in range(10):  # Crear 10 usuarios
+            # Usar el manager para crear el usuario correctamente
+            user = User.objects.create_user(
+                user_username=fake.user_name()[:20],  # Trunca a 20 caracteres
+                user_email=fake.unique.email(),
+                password="password123",  # Contraseña segura por defecto
+                user_phone=fake.phone_number()[:20],  # Trunca a 20 caracteres
+                user_is_admin=random.choice([True, False]),
+                user_is_active=True
+            )
 
-        company = random.choice(companies)
-        user_company = UserCompany.objects.create(
-            user=user,
-            company=company,
-            useco_active=True
-        )
-        user_companies.append(user_company)
+            # Asociar usuario a una compañía
+            company = random.choice(companies)
+            user_company = UserCompany.objects.create(
+                user=user,
+                company=company,
+                useco_active=True
+            )
+            user_companies.append(user_company)
+
+            print(f"Usuario {user.user_username} asociado a la compañía {company.compa_name}")
 
         # Asignar roles aleatorios a usuarios
         assigned_role = random.choice(roles)
