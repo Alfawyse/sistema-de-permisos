@@ -2,8 +2,10 @@ from django.urls import path
 from user.views import (
     UserListCreateView, UserRetrieveUpdateDestroyView,
     RoleListCreateView, RoleRetrieveUpdateDestroyView,
-    PermissionListCreateView, PermissionRetrieveUpdateDestroyView
+    PermissionListCreateView, PermissionRetrieveUpdateDestroyView,
+    UserPermissionsView
 )
+
 
 urlpatterns = [
     # Rutas para Usuarios
@@ -17,4 +19,5 @@ urlpatterns = [
     # Rutas para Permisos
     path('permissions/', PermissionListCreateView.as_view(), name='permission-list-create'),
     path('permissions/<int:pk>/', PermissionRetrieveUpdateDestroyView.as_view(), name='permission-detail'),
+    path('permissions/user/', UserPermissionsView.as_view(), name='user-permissions'),
 ]
