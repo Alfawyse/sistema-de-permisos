@@ -2,6 +2,7 @@ from rest_framework import serializers
 from user.models.user import User
 from user.models.role import Role
 from user.models.permission import Permission
+from core.models.entity_catalog import EntityCatalog
 
 # Serializador para Usuarios
 class UserSerializer(serializers.ModelSerializer):
@@ -23,3 +24,8 @@ class PermissionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Permission
         fields = ['id', 'name', 'description', 'can_create', 'can_read', 'can_update', 'can_delete', 'can_import', 'can_export']
+
+class EntityCatalogSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EntityCatalog
+        fields = '__all__'

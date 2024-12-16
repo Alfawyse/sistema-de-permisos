@@ -3,7 +3,7 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from django_filters.rest_framework import DjangoFilterBackend
 from user.models.role import Role
 from user.models.permission import Permission
-from user.serializers import UserSerializer, RoleSerializer, PermissionSerializer
+from user.serializers import UserSerializer, RoleSerializer, PermissionSerializer, EntityCatalogSerializer
 from user.filters import UserFilter, RoleFilter
 from user.permissions import IsGlobalAdmin, HasRolePermission, HasSpecificPermission  # Importa permisos personalizados
 
@@ -14,6 +14,7 @@ from rest_framework import status
 from django.db import connection
 from user.permissions import HasSpecificPermission
 from user.models.user import User
+from core.models.entity_catalog import EntityCatalog
 
 # Vista para Usuarios con Filtros, Paginación y Permisos
 class UserListCreateView(generics.ListCreateAPIView):
@@ -51,6 +52,18 @@ class PermissionRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView)
     queryset = Permission.objects.all()
     serializer_class = PermissionSerializer
     permission_classes = [HasSpecificPermission]  # Permiso personalizado
+
+# Vista para listar y crear EntityCatalog
+class EntityCatalogListCreateView(generics.ListCreateAPIView):
+    queryset = EntityCatalog.objects.all()
+    serializer_class = EntityCatalogSerializer
+    permission_classes = [IsAuthenticated]
+
+# Vista para detalles, actualización y eliminación de EntityCatalog
+class EntityCatalogRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = EntityCatalog.objects.all()
+    serializer_class = EntityCatalogSerializer
+    permission_classes = [IsAuthenticated]
 
 # Función de utilidad para llamar al procedimiento almacenado
 def obtener_permisos_usuario(user_id, entity_id):

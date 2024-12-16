@@ -3,7 +3,7 @@ from user.views import (
     UserListCreateView, UserRetrieveUpdateDestroyView,
     RoleListCreateView, RoleRetrieveUpdateDestroyView,
     PermissionListCreateView, PermissionRetrieveUpdateDestroyView,
-    UserPermissionsView
+    UserPermissionsView, EntityCatalogListCreateView, EntityCatalogRetrieveUpdateDestroyView
 )
 
 
@@ -20,4 +20,7 @@ urlpatterns = [
     path('permissions/', PermissionListCreateView.as_view(), name='permission-list-create'),
     path('permissions/<int:pk>/', PermissionRetrieveUpdateDestroyView.as_view(), name='permission-detail'),
     path('permissions/user/', UserPermissionsView.as_view(), name='user-permissions'),
+
+    path('entity-catalogs/', EntityCatalogListCreateView.as_view(), name='entity-catalog-list-create'),
+    path('entity-catalogs/<int:pk>/', EntityCatalogRetrieveUpdateDestroyView.as_view(), name='entity-catalog-detail'),
 ]

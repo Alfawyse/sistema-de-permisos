@@ -18,7 +18,7 @@ Including another URLconf
 
 from rest_framework.authtoken.views import obtain_auth_token
 from django.urls import path, include
-
+from django.contrib import admin
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
@@ -36,6 +36,7 @@ schema_view = get_schema_view(
 
 
 urlpatterns = [
+    path('admin/', admin.site.urls),
     path('api/', include('user.urls')),  # Incluir las rutas de la app "user"
     path('api/token/', obtain_auth_token, name='obtain-token'),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
