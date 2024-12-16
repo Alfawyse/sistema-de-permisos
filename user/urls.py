@@ -1,11 +1,19 @@
-from django.urls import path
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
 from user.views import (
     UserListCreateView, UserRetrieveUpdateDestroyView,
     RoleListCreateView, RoleRetrieveUpdateDestroyView,
     PermissionListCreateView, PermissionRetrieveUpdateDestroyView,
-    UserPermissionsView, EntityCatalogListCreateView, EntityCatalogRetrieveUpdateDestroyView
+    UserPermissionsView, EntityCatalogViewSet, user_info,
+    PermiUserViewSet, PermiRoleViewSet, PermiUserRecordViewSet, PermiRoleRecordViewSet
 )
 
+# Router para ViewSets
+router = DefaultRouter()
+router.register(r'permiuser', PermiUserViewSet, basename='permiuser')
+router.register(r'permirole', PermiRoleViewSet, basename='permirole')
+router.register(r'permiuserrecord', PermiUserRecordViewSet, basename='permiuserrecord')
+router.register(r'permirolerecord', PermiRoleRecordViewSet, basename='permirolerecord')
 
 urlpatterns = [
     # Rutas para Usuarios
@@ -21,6 +29,13 @@ urlpatterns = [
     path('permissions/<int:pk>/', PermissionRetrieveUpdateDestroyView.as_view(), name='permission-detail'),
     path('permissions/user/', UserPermissionsView.as_view(), name='user-permissions'),
 
-    path('entity-catalogs/', EntityCatalogListCreateView.as_view(), name='entity-catalog-list-create'),
-    path('entity-catalogs/<int:pk>/', EntityCatalogRetrieveUpdateDestroyView.as_view(), name='entity-catalog-detail'),
+    # Rutas para EntityCatalog
+    path('entity-catalogs/', EntityCatalogViewSet.as_view({'get': 'list', 'post': 'create'}), name='entity-catalog-list-create'),
+    path('entity-catalogs/<int:pk>/', EntityCatalogViewSet.as_view({'get': 'retrieve', 'put': 'update', 'delete': 'destroy'}), name='entity-catalog-detail'),
+
+    # Ruta para información del usuario autenticado
+    path('me/', user_info, name='user-info'),
+
+    # Incluir rutas de router
+    path('', include(router.urls)),
 ]

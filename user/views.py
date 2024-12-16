@@ -1,20 +1,23 @@
 from rest_framework import generics
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.permissions import IsAdminUser
 from django_filters.rest_framework import DjangoFilterBackend
 from user.models.role import Role
 from user.models.permission import Permission
-from user.serializers import UserSerializer, RoleSerializer, PermissionSerializer, EntityCatalogSerializer
+from user.serializers import UserSerializer, RoleSerializer, PermissionSerializer, PermiUserSerializer, PermiRoleSerializer,PermiUserRecordSerializer, PermiRoleRecordSerializer
 from user.filters import UserFilter, RoleFilter
-from user.permissions import IsGlobalAdmin, HasRolePermission, HasSpecificPermission  # Importa permisos personalizados
-
+from django.http import JsonResponse
 from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from user.models import PermiUser, PermiRole, PermiUserRecord, PermiRoleRecord
 from rest_framework import status
 from django.db import connection
 from user.permissions import HasSpecificPermission
 from user.models.user import User
-from core.models.entity_catalog import EntityCatalog
+from rest_framework.permissions import BasePermission
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.response import Response
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
+
 
 # Vista para Usuarios con Filtros, Paginación y Permisos
 class UserListCreateView(generics.ListCreateAPIView):
@@ -53,11 +56,41 @@ class PermissionRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView)
     serializer_class = PermissionSerializer
     permission_classes = [HasSpecificPermission]  # Permiso personalizado
 
-# Vista para listar y crear EntityCatalog
-class EntityCatalogListCreateView(generics.ListCreateAPIView):
+
+from rest_framework import viewsets
+from core.models import EntityCatalog
+from user.serializers import EntityCatalogSerializer
+
+class EntityCatalogViewSet(viewsets.ModelViewSet):
+    """
+    CRUD para sucursales y centros de costos.
+    """
     queryset = EntityCatalog.objects.all()
     serializer_class = EntityCatalogSerializer
-    permission_classes = [IsAuthenticated]
+
+# PermiUser ViewSet
+class PermiUserViewSet(viewsets.ModelViewSet):
+    queryset = PermiUser.objects.all()
+    serializer_class = PermiUserSerializer
+
+# PermiRole ViewSet
+class PermiRoleViewSet(viewsets.ModelViewSet):
+    queryset = PermiRole.objects.all()
+    serializer_class = PermiRoleSerializer
+
+# PermiUserRecord ViewSet
+class PermiUserRecordViewSet(viewsets.ModelViewSet):
+    queryset = PermiUserRecord.objects.all()
+    serializer_class = PermiUserRecordSerializer
+
+class PermissionListCreateView(generics.ListCreateAPIView):
+    queryset = Permission.objects.all()
+    serializer_class = PermissionSerializer
+
+# PermiRoleRecord ViewSet
+class PermiRoleRecordViewSet(viewsets.ModelViewSet):
+    queryset = PermiRoleRecord.objects.all()
+    serializer_class = PermiRoleRecordSerializer
 
 # Vista para detalles, actualización y eliminación de EntityCatalog
 class EntityCatalogRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
@@ -82,6 +115,19 @@ def obtener_permisos_usuario(user_id, entity_id):
         }
         for fila in filas
     ]
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def user_info(request):
+    user = request.user
+
+    if not user.is_authenticated:
+        return JsonResponse({'error': 'El usuario no está autenticado.'}, status=401)
+
+    try:
+        entities = user.usercompany_set.values('company_id', 'company__compa_name')
+        return JsonResponse({'user_id': user.id, 'entities': list(entities)}, status=200)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
 
 # Nueva vista para obtener permisos del usuario en una entidad específica
 class UserPermissionsView(APIView):
@@ -102,3 +148,17 @@ class UserPermissionsView(APIView):
             return Response({"permisos": permisos}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+# Custom permission: Solo los usuarios con el permiso 'editar permisos' pueden acceder
+class CanEditPermissions(BasePermission):
+    def has_permission(self, request, view):
+        # Verificar si el usuario tiene un rol o permiso específico
+        if not request.user.is_authenticated:
+            return False
+        return request.user.has_perm('user.edit_permissions') or request.user.is_superuser
+
+# PermiUser ViewSet con control de permisos
+class PermiUserViewSet(viewsets.ModelViewSet):
+    queryset = PermiUser.objects.all()
+    serializer_class = PermiUserSerializer
+    permission_classes = [CanEditPermissions]  # Aplicar el permiso personalizado

@@ -3,6 +3,7 @@ from user.models.user import User
 from user.models.role import Role
 from user.models.permission import Permission
 from core.models.entity_catalog import EntityCatalog
+from user.models import PermiUser, PermiRole, PermiUserRecord, PermiRoleRecord
 
 # Serializador para Usuarios
 class UserSerializer(serializers.ModelSerializer):
@@ -16,8 +17,31 @@ class RoleSerializer(serializers.ModelSerializer):
         model = Role
         fields = ['id_role', 'role_name', 'role_description', 'role_active', 'company']
 
-# Serializador para Permisos
+# PermiUser Serializer
+class PermiUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PermiUser
+        fields = '__all__'
 
+# PermiRole Serializer
+class PermiRoleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PermiRole
+        fields = '__all__'
+
+# PermiUserRecord Serializer
+class PermiUserRecordSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PermiUserRecord
+        fields = '__all__'
+
+# PermiRoleRecord Serializer
+class PermiRoleRecordSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PermiRoleRecord
+        fields = '__all__'
+
+# Serializador para Permisos
 class PermissionSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(source='id_permi', read_only=True)
 
@@ -25,7 +49,16 @@ class PermissionSerializer(serializers.ModelSerializer):
         model = Permission
         fields = ['id', 'name', 'description', 'can_create', 'can_read', 'can_update', 'can_delete', 'can_import', 'can_export']
 
+from rest_framework import serializers
+from core.models import EntityCatalog
+
 class EntityCatalogSerializer(serializers.ModelSerializer):
     class Meta:
         model = EntityCatalog
-        fields = '__all__'
+        fields = "__all__"
+
+class PermissionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Permission
+        fields = ['id_permi', 'name', 'description', 'can_create', 'can_read',
+                  'can_update', 'can_delete', 'can_import', 'can_export']

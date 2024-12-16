@@ -4,26 +4,6 @@ from django.utils.translation import gettext_lazy as _
 class EntityCatalog(models.Model):
     """
     Catálogo de Entidades.
-
-    Un catálogo de entidades representa una tabla que almacena todas las entidades 
-    (modelos) disponibles en el sistema Django, facilitando su gestión y referencia.
-
-    ¿Para qué sirve?:
-
-    1. Mantener un registro centralizado de todas las entidades del sistema.
-
-    2. Facilitar la gestión y el mantenimiento de la estructura de la base de datos.
-
-    3. Permitir la referencia dinámica a diferentes modelos del sistema.
-
-    4. Proveer una base para la implementación de funcionalidades genéricas.
-
-    5. Apoyar en la documentación y organización del sistema.
-
-    Creado por:
-    @Claudio
-
-    Fecha: 27/9/2024
     """
 
     id_entit = models.AutoField(
@@ -56,24 +36,30 @@ class EntityCatalog(models.Model):
         help_text=_("Configuración adicional para el elemento del catálogo.")
     )
 
+    # **NUEVOS CAMPOS**
+    ENTIT_TYPE_CHOICES = [
+        ('branch_office', 'Branch Office'),
+        ('cost_center', 'Cost Center'),
+    ]
+
+    entit_type = models.CharField(
+        max_length=50,
+        choices=ENTIT_TYPE_CHOICES,
+        verbose_name=_("Tipo de Entidad"),
+        help_text=_("Tipo de entidad: Sucursal o Centro de Costos.")
+    )
+
+    company = models.ForeignKey(
+        'Company',
+        on_delete=models.CASCADE,
+        related_name="entities",
+        verbose_name=_("Compañía"),
+        help_text=_("Compañía a la que pertenece la entidad.")
+    )
+
     class Meta:
         verbose_name = _("Catálogo de Entidad")
         verbose_name_plural = _("Catálogos de Entidades")
 
     def __str__(self):
-        return f"{self.entit_name} ({self.id_entit})"
-
-    def clean(self):
-        """
-        Realiza validaciones adicionales antes de guardar el objeto.
-        """
-        self.entit_name = self.entit_name.lower()
-        self.entit_descrip = self.entit_descrip.capitalize()
-        super().clean()
-
-    def save(self, *args, **kwargs):
-        """
-        Sobrescribe el método save para asegurar una limpieza completa antes de guardar.
-        """
-        #self.full_clean()
-        super().save(*args, **kwargs)
+        return f"{self.entit_name} ({self.entit_type})"
